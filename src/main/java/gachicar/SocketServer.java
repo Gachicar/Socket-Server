@@ -28,6 +28,8 @@ public class SocketServer {
 
             System.out.println("Server is running on port " + portNumber);
 
+            hm = new HashMap<String, PrintWriter>();
+
             while (true) {
                 try {
                     clientSocket = serverSocket.accept();

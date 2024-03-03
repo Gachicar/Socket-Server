@@ -19,7 +19,7 @@ public class ServerThread implements Runnable{
 
         try	{
             ois = new BufferedReader(new InputStreamReader(child.getInputStream()));
-            oos = new PrintWriter(child.getOutputStream());
+            oos = new PrintWriter(child.getOutputStream(), true);
 
             ip = child.getInetAddress();
             nickname = user_id;
@@ -29,7 +29,9 @@ public class ServerThread implements Runnable{
             }
 
             System.out.println(ip + "로부터 " + user_id + "님이 접속하였습니다.");
-            oos.println("사용자의 공유차량 정보");
+
+            String userCarName = "가치카";
+            oos.println("사용자의 공유차량: " + userCarName);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -40,8 +42,11 @@ public class ServerThread implements Runnable{
         String inputLine;
         try {
             while ((inputLine = ois.readLine()) != null) {
-                // 클라이언트가 "종료"를 보냈을 때
-                if ("종료".equals(inputLine.trim())) {
+                // 클라이언트 접속 종료 명령
+                if (inputLine.equals("/quit")) {
+                    // 주행 기록 요약
+                    report(nickname);
+
                     synchronized(hm) {
                         hm.remove(nickname);
                     }
@@ -49,7 +54,7 @@ public class ServerThread implements Runnable{
                 }
                 else if (inputLine.contains("집") && inputLine.contains("가")) {
                     speakToMe("네, 알겠습니다.");
-                    sendMsgToMe(checkRC("가치카", "학교", "집", "시작"));
+                    checkRC("학교", "집", "시작");
 
                     // RC카에 명령 보내기
 
@@ -78,7 +83,6 @@ public class ServerThread implements Runnable{
             try {
                 for (PrintWriter oos : hm.values( )){
                     oos.println(message);
-//                    oos.flush(); // 메시지 전송
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -91,9 +95,8 @@ public class ServerThread implements Runnable{
         hm.forEach((key, value) -> {
             if (key.equals(nickname)) {
                 PrintWriter oos = hm.get(key);
-                System.out.println(nickname);
+                System.out.println(message);
                 oos.println(message);
-//                oos.flush();
             }
         });
     }
@@ -104,22 +107,29 @@ public class ServerThread implements Runnable{
             if (!key.equals(nickname)) {
                 PrintWriter oos = hm.get(key);
                 oos.println(message);
-//                oos.flush();
             }
         });
     }
 
     // 사용자 명령 확인 메시지 생성
-    public String checkRC(String carName, String departure, String destination, String Command) {
+    public void checkRC(String departure, String destination, String Command) {
         // 원래는.. 사용자 id로 공유차량 정보 가져오기
         // + 사용자, 출발지, 목적지 => DB에 저장
-        return "차량 별명: " + carName +
-                "\n출발지: " + departure +
-                "\n목적지: " + destination +
-                "\n명령어: " + "시작";
+        sendMsgToMe("r/- 출발지: " + departure +
+                "\n- 목적지: " + destination +
+                "\n- 명령어: " + "시작");
     }
 
     public void speakToMe(String message) {
         sendMsgToMe("spk/" + message);
+    }
+
+    public void report(String user_id) {
+        // 사용자 정보로 공유차량 주행 기록 가져오기
+        String msg = "[차량 주행 기록]" +
+                "\n주행 거리: 10km" +
+                "\n주유 상태: 보통" +
+                "\n주행 시간: 30분";
+        sendMsgToMe("report/" + msg);
     }
 }
