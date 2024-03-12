@@ -15,13 +15,13 @@ public class SocketClient {
     BufferedReader read;
     PrintWriter oos;
     BufferedReader ois;
-    String user_id;
+    Long user_id;
     String sendData;
     ClientThread rt;
 
     boolean endflag = false;
 
-    public SocketClient(String id, String ip) {
+    public SocketClient(Long id, String ip) {
         user_id = id;
         ipAddress = ip;
 
@@ -32,7 +32,8 @@ public class SocketClient {
             ois = new BufferedReader(new InputStreamReader(client.getInputStream()));
             oos = new PrintWriter(client.getOutputStream(), true);
 
-            oos.println(user_id);
+            // 사용자 아이디를 먼저 보냄.
+//            oos.println(user_id);
 
             rt = new ClientThread(client, ois);
             Thread t = new Thread(rt);
@@ -69,8 +70,9 @@ public class SocketClient {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        System.out.print("닉네임을 입력하세요: ");
-        String id = sc.next();
-        new SocketClient(id, "localhost");
+//        System.out.print("아이디를 입력하세요: ");
+//        Long id = sc.nextLong();
+
+        new SocketClient(1L, "localhost");
     }
 }
