@@ -33,7 +33,7 @@ public class SocketClient {
             oos = new PrintWriter(client.getOutputStream(), true);
 
             // 사용자 아이디를 먼저 보냄.
-//            oos.println(user_id);
+            oos.println(user_id);   // 사용자 id (Get으로 내 정보 받아와서 보내기..?)
 
             rt = new ClientThread(client, ois);
             Thread t = new Thread(rt);
@@ -70,9 +70,9 @@ public class SocketClient {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-//        System.out.print("아이디를 입력하세요: ");
-//        Long id = sc.nextLong();
+        System.out.print("아이디를 입력하세요: ");
+        Long id = sc.nextLong();
 
-        new SocketClient(1L, "localhost");
+        new SocketClient(id, "localhost");
     }
 }
